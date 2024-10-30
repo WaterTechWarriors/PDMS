@@ -2,6 +2,12 @@
 
 A Python application for processing PDF files and creating structured outputs. This tool is designed for batch processing of PDF documents with a focus on annotation extraction and content structuring, featuring detailed logging and an interactive command-line interface.
 
+## Demo Video
+
+[![PDF Processing Tool Demo](https://img.youtube.com/vi/GGxD2veCMvE/0.jpg)](https://youtu.be/GGxD2veCMvE?si=kgZ6Jj-DVwOu6FaX)
+
+Click the image above to watch a demonstration of how this tool works.
+
 ## Features
 
 - 📄 Batch PDF processing
