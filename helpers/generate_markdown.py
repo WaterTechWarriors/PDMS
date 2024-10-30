@@ -47,7 +47,7 @@ def generate_markdown(json_data, visual=False):
         current_page = page_number
         
         # Display the chunk text first
-        chunk_text = item['text']
+        chunk_text = "> " + "\n> ".join(item['text'].splitlines())
         chunk_id = item['id']
         page_content += f"<details style='weight:bold'>\n<summary>Chunk {chunk_id}</summary>\n\n"
         page_content += f"<details style='color: #583;weight:bold;padding-left: 1em;'>\n<summary>Chunk Text</summary>\n\n{chunk_text}\n\n</details>\n\n"
