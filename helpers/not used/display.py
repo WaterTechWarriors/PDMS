@@ -10,17 +10,7 @@ from rich.prompt import Prompt
 
 console = Console()
 
-def is_valid_directory(path):
-    """
-    Validate if a path is a directory.
 
-    Args:
-        path (str): The path to validate.
-
-    Returns:
-        bool: True if the path is a directory, False otherwise.
-    """
-    return os.path.isdir(path)
 
 def select_json_file(directory):
     """

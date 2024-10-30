@@ -15,12 +15,11 @@ import logging
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
 from .config import global_config
-from .display import select_json_file
 
 PAGE_FOOTER = "\n\n---\nPage {current_page}\n\n---\n\n"
 console = Console()
 
-def json_to_markdown(json_data, visual=False):
+def create_debugging_markdown(json_data, visual=False):
     """
     Converts JSON data to Markdown format.
 
@@ -84,7 +83,7 @@ def create_markdowns():
     Creates markdown files from JSON data in the output directory.
     Allows user to select which JSON files to convert.
     """
-    output_dir = os.path.realpath(global_config.get('DIRECTORIES', 'output_dir'))
+    output_dir = os.path.realpath(global_config.directories.output_dir)
     unstructured_json_dir = os.path.join(output_dir, '01_partitioned')
     json_files = select_json_file(unstructured_json_dir)
     

@@ -26,58 +26,7 @@ import sys
 import json
 from types import SimpleNamespace
 
-# Add the GlobalConfig class
-class GlobalConfig:
-    """
-    A class to manage global configuration settings.
-    """
-    def __init__(self):
-        self.config = None
-
-    def load(self, config_dict):
-        """
-        Load configuration from a dictionary.
-
-        Args:
-            config_dict (dict): Configuration data.
-        """
-        self.config = json.loads(json.dumps(config_dict), object_hook=lambda d: SimpleNamespace(**d))
-
-    def set(self, section, key, value):
-        """
-        Set a configuration value.
-
-        Args:
-            section (str): The section of the configuration.
-            key (str): The key within the section.
-            value: The value to set.
-        """
-        try:
-            setattr(getattr(self.config, section), key, value)
-        except AttributeError:
-            raise KeyError(f"Section '{section}' or key '{key}' not found in configuration.")
-
-    def get(self, section, key):
-        """
-        Get a configuration value.
-
-        Args:
-            section (str): The section of the configuration.
-            key (str): The key within the section.
-
-        Returns:
-            The configuration value, or None if not found.
-        """
-        try:
-            return getattr(getattr(self.config, section), key)
-        except AttributeError:
-            return None
-
-    def __str__(self):
-        return str(self.config.__dict__)
-
-# Create an instance of GlobalConfig
-global_config = GlobalConfig()
+global_config = SimpleNamespace()
 
 DEFAULT_CONFIG = """
 [API_KEYS]
@@ -125,9 +74,6 @@ def load_config(config_path='config.ini'):
     config = configparser.ConfigParser()
     config.read(config_path)
     
-    # Read the configuration file
-    config.read('config.ini')
-
     # Check for critical parameters
     critical_params = [
         ('API_KEYS', 'unstructured_api_key','your_unstructured_api_key_here'),
@@ -156,17 +102,23 @@ def load_config(config_path='config.ini'):
         print("Please update these values in your config.ini file before running the program.")
         sys.exit(1)
     
-    # Convert the configuration to a dictionary
-    config_dict = {section: dict(config.items(section)) for section in config.sections()}
-
-    # Load the config into the GlobalConfig instance
-    global_config.load(config_dict)
+    for section in config.sections():
+        # Create a namespace for each section
+        section_namespace = SimpleNamespace()
+        
+        for key, value in config.items(section):
+            # Set each key-value pair in the namespace
+            setattr(section_namespace, key, value)
+        
+        # Attach the section namespace to the main config
+        setattr(global_config, section.lower(), section_namespace)
+    
     
     logging.debug(f"global_config set in load_config: {global_config}")
     
     # Ensure directories exist
-    input_dir = global_config.get('DIRECTORIES', 'input_dir')
-    output_dir = global_config.get('DIRECTORIES', 'output_dir')
+    input_dir = global_config.directories.input_dir
+    output_dir = global_config.directories.output_dir
     
     if input_dir:
         os.makedirs(input_dir, exist_ok=True)
@@ -181,8 +133,7 @@ def load_config(config_path='config.ini'):
         logging.error("OUTPUT_DIR not found in configuration")    
     
     logging.info("Configuration loaded successfully")
-    logging.debug(f"Global config contents: {global_config}")
-
+    
     return global_config
 
 def save_config():
@@ -204,24 +155,6 @@ def save_config():
         config.write(configfile)
     logging.info("Configuration saved successfully to config.ini")
 
-def get_config(section, key, fallback=None):
-    """
-    Retrieve a configuration value with a fallback option.
-
-    Args:
-        section (str): The section of the configuration.
-        key (str): The key within the section.
-        fallback: The fallback value if the key is not found.
-
-    Returns:
-        The configuration value or the fallback.
-    """
-    config = configparser.ConfigParser()
-    config.read('config.ini')
-    try:
-        return config[section][key]
-    except KeyError:
-        return fallback
 
 def load_configuration(): 
     """

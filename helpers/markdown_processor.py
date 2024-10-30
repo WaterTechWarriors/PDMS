@@ -16,7 +16,7 @@ import base64
 import gzip
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
-from .config import global_config, get_config
+from .config import global_config
 from unstructured.partition.md import partition_md
 from unstructured.chunking.title import chunk_by_title
 from unstructured.staging.base import elements_from_base64_gzipped_json
@@ -26,7 +26,7 @@ console = Console()
 
 def process_markdown_files():
     """Process all markdown files in the output directory with chunking."""
-    output_dir = os.path.realpath(global_config.get('DIRECTORIES', 'output_dir'))
+    output_dir = os.path.realpath(global_config.directories.output_dir)
     markdown_dir = os.path.join(output_dir, '03_markdown')
     chunked_dir = os.path.join(output_dir, '02_chunked')
     

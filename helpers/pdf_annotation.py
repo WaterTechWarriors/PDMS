@@ -1,12 +1,10 @@
 """
------------------------------------------------------------------
-(C) 2024 Prof. Tiran Dagan, FDU University. All rights reserved.
------------------------------------------------------------------
-
 PDF Annotation and Visualization Tool (Unstructured.io API version)
-
-This module provides functionality to annotate and visualize PDF pages with bounding boxes
+Provides functionality to annotate and visualize PDF pages with bounding boxes
 around different types of content using the Unstructured.io API.
+
+Author: Prof. Tiran Dagan, FDU University
+Copyright: (C) 2024. All rights reserved.
 """
 
 import fitz
@@ -15,14 +13,22 @@ import matplotlib.pyplot as plt
 from PIL import Image
 import os
 import logging
-from rich.progress import Progress, SpinnerColumn, TextColumn
+from rich.progress import (
+    Progress, 
+    SpinnerColumn, 
+    TextColumn, 
+    BarColumn, 
+    TaskProgressColumn,
+    TimeRemainingColumn
+)
 from rich.console import Console
 from .config import global_config
-from .pdf_ingest import get_json_file_elements
+from .file_and_folder import get_json_file_elements
 
 console = Console()
 
-def log_to_file():
+def setup_logging():
+    """Initialize file-based logging for the PDF annotation process"""
     logger = logging.getLogger(__name__)
     file_handler = logging.FileHandler('pdf_converter.log')
     formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
@@ -31,11 +37,15 @@ def log_to_file():
         logger.handlers.clear()
     logger.addHandler(file_handler)
 
-
-def plot_pdf_with_boxes(pdf_page, documents, output_filename, output_dir):
+def draw_bounding_boxes(pdf_page, documents, output_filename, output_dir):
     """
-    Annotate a PDF page with bounding boxes for different content types and save as an image.
-    Skip if the output image already exists.
+    Generate annotated visualization of a PDF page with colored bounding boxes
+    
+    Args:
+        pdf_page: PDF page object from PyMuPDF
+        documents: List of document elements with coordinates and types
+        output_filename: Path to the original PDF file
+        output_dir: Directory to save the annotated images
     """
     base_filename = os.path.splitext(os.path.basename(output_filename))[0]
     complete_image_path = os.path.join(
@@ -43,9 +53,8 @@ def plot_pdf_with_boxes(pdf_page, documents, output_filename, output_dir):
         f"{base_filename}-{pdf_page.number + 1}-annotated.jpg"
     )
     
-    # Skip if file already exists
     if os.path.exists(complete_image_path):
-        logging.info(f"Skipping existing file: {complete_image_path}")
+        logging.info(f"Skipping existing annotation for {base_filename} page {pdf_page.number + 1}")
         return
         
     pix = pdf_page.get_pixmap()
@@ -91,46 +100,46 @@ def plot_pdf_with_boxes(pdf_page, documents, output_filename, output_dir):
     fig.savefig(complete_image_path, format="jpg", dpi=300)
     plt.close(fig)
 
-    logging.info(f"{boxes_drawn} annotations on page {pdf_page.number + 1} of: {base_filename}")
-
-def get_pdf_page_count(file_path):
+def annotate_pdf_pages(file_name: str, num_pages: int, progress=None):
     """
-    Get the number of pages in a PDF file.
-
-    Args:
-        file_path (str): Path to the PDF file.
-
-    Returns:
-        int: The number of pages in the PDF.
-    """
-    with fitz.open(file_path) as pdf:
-        return len(pdf)
-
-def process_pdf_pages(file_name: str, num_pages: int, progress=None):
-    """
-    Process the pages of a PDF file, creating an annotated image for each page.
-
-    Args:
-        file_name (str): Name of the PDF file.
-        num_pages (int): Total number of pages in the PDF.
-        progress (Progress, optional): Progress instance for tracking. If None, no progress is shown.
-    """
-    output_dir = global_config.get('DIRECTORIES', 'output_dir')
-    input_dir = global_config.get('DIRECTORIES', 'input_dir')
+    Process and annotate all pages in a PDF file with bounding boxes
     
-    image_dir = os.path.join(output_dir, '02_bounding_boxes')
-    
-    input_json_path = os.path.join(output_dir, '01_partitioned', file_name )
+    Args:
+        file_name: Name of the PDF file to process
+        num_pages: Total number of pages in the PDF
+        progress: Optional Progress instance for tracking
+    """
+    output_dir = global_config.directories.output_dir
+    input_dir = global_config.directories.input_dir
+    image_dir = os.path.join(output_dir, '03_annotated_pages')
+    input_json_path = os.path.join(output_dir, '01_partitioned', file_name)
     input_file_path = os.path.join(input_dir, file_name)
     
     pdf = fitz.open(input_file_path)
     docs = get_json_file_elements(input_json_path)
     
-    for page_number in range(1, num_pages + 1):
-        if progress:
-            progress.update(progress.task_ids[0], description=f"Processing page {page_number}/{num_pages}", advance=1)
+    with Progress(
+        SpinnerColumn(),
+        TextColumn("[progress.description]{task.description}"),
+        BarColumn(),
+        TaskProgressColumn(),
+        TimeRemainingColumn(),
+        console=console
+    ) as progress_bar:
+        task = progress_bar.add_task(
+            f"[cyan]Annotating PDF: {file_name}", 
+            total=num_pages
+        )
         
-        page_docs = [doc for doc in docs if doc['metadata'].get('page_number') == page_number]
-        plot_pdf_with_boxes(pdf.load_page(page_number - 1), page_docs, input_file_path, image_dir)
+        for page_number in range(1, num_pages + 1):
+            progress_bar.update(
+                task,
+                description=f"[cyan]Annotating page {page_number}/{num_pages}"
+            )
+            
+            page_docs = [doc for doc in docs if doc['metadata'].get('page_number') == page_number]
+            draw_bounding_boxes(pdf.load_page(page_number - 1), page_docs, input_file_path, image_dir)
+            
+            progress_bar.advance(task)
             
     pdf.close()

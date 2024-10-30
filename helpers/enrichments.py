@@ -3,7 +3,7 @@
 (C) 2024 Prof. Tiran Dagan, FDU University. All rights reserved.
 -----------------------------------------------------------------
 
-LLM Image Summary Module
+Partition JSON Enrichment Module
 
 This module provides functionality to enhance JSON data with LLM-generated
 summaries of images using OpenAI's GPT-4 Vision model.
@@ -16,7 +16,7 @@ import os
 import logging
 from rich.console import Console
 from rich.progress import Progress, SpinnerColumn, TextColumn
-from .display import select_json_file
+
 
 console = Console()
 
@@ -30,32 +30,31 @@ def enrich_json_with_summaries(json_file):
     with open(json_file, 'r', encoding='utf-8') as f:
         json_data = json.load(f)
 
-    # Count unprocessed images
-    images_to_process = [item for item in json_data 
-                        if item['type'] == 'Image' and 'image_description' not in item['metadata']
-                        ]
-    total_images = len(images_to_process)
+    # Retrieve lists of items to enrich
+    # See element types in document elements: https://docs.unstructured.io/api-reference/api-services/document-elements
     
-    if total_images == 0:
-        console.print("No new images to process", style="yellow")
-        return json_data
-
+    imageElements = [item for item in json_data if item['type'] == 'Image']
+    tableElements = [item for item in json_data if item['type'] == 'Table']
+    textElements = [item for item in json_data if item['type'] == 'NarrativeText']
+    
     with Progress(
         SpinnerColumn(),
         TextColumn("[progress.description]{task.description}"),
         transient=True
     ) as progress:
+        
+        # Images
         task = progress.add_task(
-            f"Processing images in {os.path.basename(json_file)}", 
-            total=total_images
+            f"Enriching images", 
+            total=len(imageElements)
         )
 
-        for item in images_to_process:
+        for idx, item in enumerate(imageElements, 1):
+            progress.update(task, description=f"Enriching images: {idx}/{len(imageElements)}")
             image_base64 = item['metadata'].get('image_base64')
             if image_base64:
                 try:
                     summary = summarize_image(image_base64)
-                    #item['metadata']['image_description'] = summary
                     item['text'] = summary
 
                     # Save after each image is processed
@@ -70,6 +69,28 @@ def enrich_json_with_summaries(json_file):
                 console.print(f"Skipping image without base64 data: {item.get('text', 'Unnamed image')}", 
                             style="yellow")
 
+        # Tables
+        # To Do
+        task = progress.add_task(
+            f"Processing tables", 
+            total=len(tableElements)
+        )
+
+        for item in tableElements:
+            # To Do
+            pass
+
+        # Text
+        # To Do
+        task = progress.add_task(
+            f"Processing text", 
+            total=len(textElements)
+        )
+
+        for item in textElements:
+            # To Do
+            pass
+
     return
 
 def summarize_image(image_base64):
@@ -82,7 +103,7 @@ def summarize_image(image_base64):
     Returns:
         str: A text summary of the image content.
     """
-    client = OpenAI(api_key=global_config.get('API_KEYS', 'openai_api_key'))
+    client = OpenAI(api_key=global_config.api_keys.openai_api_key)
     
     prompt = """You are an image summarizing agent. I will be giving you an image and you will provide a summary describing 
     the image, starting with "An image", or "An illustration", or "A diagram:", or "A logo:" or "A symbol:". If it contains a part, 
@@ -111,21 +132,3 @@ def summarize_image(image_base64):
     )
     
     return response.choices[0].message.content
-
-def build_json_image_summaries():
-    """Enhances images in JSON files with LLM-generated summaries."""
-    output_dir = os.path.realpath(global_config.get('DIRECTORIES', 'output_dir'))
-    partitioned_dir = os.path.join(output_dir, '01_partitioned')
-    json_files = select_json_file(partitioned_dir)
-    
-    if not json_files:
-        return
-    
-    for json_file in json_files:
-        try:
-            console.print(f"\nProcessing {os.path.basename(json_file)}...", style="blue")
-            enrich_json_with_summaries(json_file)
-            logging.info(f"Enhanced images in {json_file}")
-        except Exception as e:
-            console.print(f"Error processing {json_file}: {str(e)}", style="red")
-            logging.error(f"Error processing {json_file}: {str(e)}")
