@@ -47,7 +47,7 @@ def generate_markdown(json_data, visual=False):
         current_page = page_number
         
         # Display the chunk text first
-        chunk_text = "> " + "\n> ".join(item['text'].splitlines())
+        chunk_text = " > " + "\n> ".join(item['text'].splitlines())
         chunk_id = item['id']
         page_content += f"<details style='weight:bold'>\n<summary>Chunk {chunk_id}</summary>\n\n"
         page_content += f"<details style='color: #583;weight:bold;padding-left: 1em;'>\n<summary>Chunk Text</summary>\n\n{chunk_text}\n\n</details>\n\n"
@@ -75,7 +75,7 @@ def generate_markdown(json_data, visual=False):
                 if image_base64:
                         # Determine the image format (assuming it's either PNG or JPEG)
                         image_format = 'png' if orig_element['image_mime_type'] == 'image/png' else 'jpeg'
-                        summary = f"<p style=\"line-height:.9; bgcolor: #000\"><span style=\"font-family:Tahoma; font-size:.7em; color: #705\">{orig_element['text']}</span></p>"
+                        summary = f"<p style=\"line-height:.9; bgcolor: #000\"><span style=\"font-family:Tahoma; font-size:.7em; color: #24a8fb\">{orig_element['text']}</span></p>"
                         image_tag = f"![IMAGE:](data:image/{image_format};base64,{image_base64})"
                         page_content += f"| {image_tag}  |\n|:--:|\n| {summary} |\n\n"
                 else:
