@@ -70,6 +70,16 @@ def generate_markdown(json_data, visual=False):
             elif category == 'Table':
                 #page_content += orig_element['metadata'].get('text_as_html', '') + "\n\n"
                 page_content += f"> {content}\n\n"
+                image_base64 = orig_element['image']
+                if image_base64:
+                        # Determine the image format (assuming it's either PNG or JPEG)
+                        image_format = 'png' if orig_element['image_mime_type'] == 'image/png' else 'jpeg'
+                        summary = f"<p style=\"line-height:.9; bgcolor: #000\"><span style=\"font-family:Tahoma; font-size:.7em; color: #24a8fb\">{orig_element['text']}</span></p>"
+                        image_tag = f"![IMAGE:](data:image/{image_format};base64,{image_base64})"
+                        page_content += f"| {image_tag}  |\n|:--:|\n| {summary} |\n\n"
+                else:
+                    page_content += f"> Image: {content or '?Unknown'}\n\n"
+                
             elif category == 'Image':
                 image_base64 = orig_element['image']
                 if image_base64:
