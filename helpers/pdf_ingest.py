@@ -31,8 +31,6 @@ from unstructured_ingest.v2.processes.partitioner import PartitionerConfig
 from unstructured_ingest.v2.processes.chunker import ChunkerConfig
 from unstructured_ingest.v2.logger import logger as unstructured_logger
 
-   
-
 @dataclass
 class PipelineConfigs:
     """Configuration container for Unstructured.io pipeline"""
