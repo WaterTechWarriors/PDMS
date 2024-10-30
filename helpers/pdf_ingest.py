@@ -13,6 +13,7 @@ import logging
 import os
 from dataclasses import dataclass
 from typing import List, Optional
+
 from .config import global_config
 from .pdf_annotation import annotate_pdf_pages
 from .enrichments import enrich_json_with_summaries
@@ -21,12 +22,7 @@ from .file_and_folder import get_files_with_extension, get_pdf_page_count
 from rich.console import Console
 from unstructured_ingest.v2.pipeline.pipeline import Pipeline
 from unstructured_ingest.v2.interfaces import ProcessorConfig
-from unstructured_ingest.v2.processes.connectors.local import (
-    LocalIndexerConfig,
-    LocalDownloaderConfig,
-    LocalConnectionConfig,
-    LocalUploaderConfig
-)
+from unstructured_ingest.v2.processes.connectors.local import (LocalIndexerConfig,LocalDownloaderConfig,LocalConnectionConfig,LocalUploaderConfig)
 from unstructured_ingest.v2.processes.partitioner import PartitionerConfig
 from unstructured_ingest.v2.processes.chunker import ChunkerConfig
 from unstructured_ingest.v2.logger import logger as unstructured_logger
@@ -47,12 +43,11 @@ class PDFProcessor:
         self.console = Console()
         self.setup_logging()
         self.setup_directories()
-        
 
     def setup_logging(self):
         """Configure logging settings"""
         unstructured_logger.setLevel(logging.CRITICAL)
-        
+        unstructured_logger.disabled = True
     def setup_directories(self):
         """Create necessary output directories"""
         self.output_dir = os.path.realpath(global_config.directories.output_dir)

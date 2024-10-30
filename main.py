@@ -18,18 +18,17 @@ Usage:
 python 01_RAG_ingest_app.py
 """
 
-import logging
 import os
+
 from helpers import *
 from helpers.pdf_ingest import PDFProcessor
 from helpers.logging import setup_logging
+from helpers.generate_markdown import create_debugging_markdown
 
 from rich.console import Console
 from rich.prompt import Confirm, Prompt
 
 console = Console()
-
-
 
 def is_valid_directory(path):
     return os.path.isdir(path)
@@ -39,6 +38,7 @@ def select_task():
     tasks = [
         "Ingest PDFs and create JSON & Annotations",
         "Create Debugging Markdowns from partition JSONs",
+        "Exit"
     ]
     
     console.print("\nAvailable tasks:", style="blue")
@@ -65,12 +65,12 @@ def main():
             pdf_files = get_files_with_extension(input_dir, '.pdf')
             processor.process_pdfs(input_dir, pdf_files)
             
-        elif task == "Create Markdowns from JSON output files":
-            process_markdown_files()
+        elif task == "Create Debugging Markdowns from partition JSONs":
+            create_debugging_markdown()
         
-        if not Confirm.ask("\nWould you like to perform another task?"):
+        elif task == "Exit":
             break
-    
+        
     console.print("\nApplication completed.", style="green")
 
 if __name__ == "__main__":
