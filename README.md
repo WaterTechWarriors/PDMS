@@ -1,14 +1,13 @@
 # PDF Ingestion and Processing Tool
 
-A powerful Python application for processing PDF files, extracting annotations, and generating structured output. This tool is designed to handle batch processing of PDF documents while maintaining detailed logging and providing user-friendly command-line interactions.
+A Python application for processing PDF files and creating structured outputs. This tool is designed for batch processing of PDF documents with a focus on annotation extraction and content structuring, featuring detailed logging and an interactive command-line interface.
 
 ## Features
 
 - 📄 Batch PDF processing
 - 📑 Annotation extraction
-- 🖼️ Bounding box image generation (optional)
 - 📊 JSON output generation
-- 📝 Markdown conversion capabilities
+- 📝 Markdown conversion for debugging
 - 🔄 Progress tracking
 - 📋 Detailed logging
 
@@ -20,99 +19,114 @@ git clone https://github.com/tirandagan/AdvancedRAGingest.git
 cd AdvancedRAGingest
 ```
 
-2. Create a virtual environment and activate it:
-
+2. Install Poetry (if not already installed):
 ```bash
-python -m venv venv
-source venv/bin/activate # On Windows: venv\Scripts\activate
+curl -sSL https://install.python-poetry.org | python3 -
 ```
 
-3. Install the required dependencies:
-
+3. Install dependencies using Poetry:
 ```bash
-pip install -r requirements.txt
+poetry install
+```
+
+4. Activate the Poetry shell:
+```bash
+poetry shell
 ```
 
 ## Directory Structure
 
-Before running the application, ensure you have the following directory structure:
+The application uses the following directory structure:
 
+```
 project_root/
-├── input/ # Place your PDF files here
+├── input/              # Place your PDF files here
 ├── output/
-│ ├── json/ # Generated JSON files
-│ ├── annotations/ # Extracted annotations
-│ ├── images/ # Generated bounding box images
-│ └── markdown/ # Generated markdown files
-├── logs/ # Application logs
-└── config.yaml # Configuration file
+│   ├── json/          # Generated JSON files with PDF content
+│   └── annotations/   # Extracted annotations
+├── logs/              # Application logs
+├── pyproject.toml     # Poetry dependency management
+└── config.yaml        # Configuration file
+```
 
 ## Usage
 
 1. Place your PDF files in the `input/` directory.
 
-2. Run the application:
-
+2. Ensure you're in the Poetry shell:
+```bash
+poetry shell
 ```
+
+3. Run the application:
+```bash
 python 01_LoadPDFs.py
 ```
 
-
-3. Select your desired task from the menu:
-   - Option 1: Ingest PDFs and create JSON & Annotations
-   - Option 2: Create Debugging Markdowns from partition JSONs
+4. Select from two available tasks:
+   - Option 1: "Ingest PDFs and create JSON & Annotations"
+     - Processes PDF files from the input directory
+     - Extracts content and annotations
+     - Generates JSON output files
+   - Option 2: "Create Debugging Markdowns from partition JSONs"
+     - Creates markdown files from previously processed JSON files
+     - Useful for debugging and content verification
 
 ## Output Description
 
-After processing, you'll find the following in your output directories:
+The processing generates several types of output files:
 
 ### JSON Output (`output/json/`)
-- Contains structured JSON files for each processed PDF
-- Includes metadata, content, and annotation information
-- Format: `{original_filename}_processed.json`
+- Structured content extracted from PDFs
+- Includes document metadata and text content
+- Organized in a format suitable for further processing
 
 ### Annotations (`output/annotations/`)
-- Extracted annotations from the PDFs
+- Contains extracted PDF annotations
 - Includes highlights, comments, and other markup
-- Format: `{original_filename}_annotations.json`
-
-### Images (`output/images/`)
-- Generated images showing bounding boxes of annotations
-- Useful for debugging and verification
-- Format: `{original_filename}_page_{number}.png`
-
-### Markdown (`output/markdown/`)
-- Generated markdown files for easy viewing
-- Contains processed content in a readable format
-- Format: `{original_filename}.md`
+- Preserved in structured format for analysis
 
 ## Logging
 
-The application maintains detailed logs in `pdf_converter.log`, including:
-- Processing status
-- Error messages
-- Warning notifications
+The application generates detailed logs in `pdf_converter.log`:
+- Processing status and progress
+- Warning and error messages
 - Operation timestamps
+
+The following log sources are managed:
+- http.client (ERROR level)
+- httpx (ERROR level)
+- unstructured (ERROR level)
+- unstructured_ingest (ERROR level)
 
 ## Configuration
 
-You can modify the `config.yaml` file to customize:
-- Input/output directory paths
+The application uses a configuration system that can be customized through `config.yaml`. Configuration is loaded at startup and includes:
+- Directory paths
 - Processing options
-- Logging levels
-- Image generation settings
+- Logging settings
 
 ## Error Handling
 
-The application includes robust error handling for:
-- Invalid PDF files
-- Missing directories
-- Processing failures
-- Permission issues
+The application includes error handling for:
+- Invalid directory paths
+- PDF processing errors
+- Configuration issues
+- File system operations
 
-## Contributing
+## Development
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+For development work:
+```bash
+# Install development dependencies
+poetry install --with dev
+
+# Run tests
+poetry run pytest
+
+# Format code
+poetry run black .
+```
 
 ## License
 
@@ -120,4 +134,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## Support
 
-For issues, questions, or suggestions, please [open an issue](your-repository-url/issues) on GitHub.
+For issues, questions, or suggestions, please [open an issue](https://github.com/tirandagan/AdvancedRAGingest/issues) on GitHub.
