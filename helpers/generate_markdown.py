@@ -152,7 +152,7 @@ def create_debugging_markdown():
                                                     "text": text,
                                                     "page_number": page_number}
 
-                            if type == "Image":
+                            if type == "Image" or type == "Table":
                                 output_dict["image"] = image
                                 output_dict["image_mime_type"] = image_mime_type
                             
