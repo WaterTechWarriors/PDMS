@@ -17,7 +17,6 @@ from .config import global_config
 from .pdf_annotation import annotate_pdf_pages
 from .enrichments import enrich_json_with_summaries
 from .file_and_folder import get_files_with_extension, get_pdf_page_count
-from .logging import setup_logging
 
 from rich.console import Console
 from unstructured_ingest.v2.pipeline.pipeline import Pipeline
@@ -30,8 +29,9 @@ from unstructured_ingest.v2.processes.connectors.local import (
 )
 from unstructured_ingest.v2.processes.partitioner import PartitionerConfig
 from unstructured_ingest.v2.processes.chunker import ChunkerConfig
+from unstructured_ingest.v2.logger import logger as unstructured_logger
 
-setup_logging()
+   
 
 @dataclass
 class PipelineConfigs:
@@ -50,9 +50,9 @@ class PDFProcessor:
         self.setup_logging()
         self.setup_directories()
         
+
     def setup_logging(self):
         """Configure logging settings"""
-        unstructured_logger = logging.getLogger('unstructured_ingest.v2')
         unstructured_logger.setLevel(logging.CRITICAL)
         
     def setup_directories(self):
