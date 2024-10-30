@@ -1,25 +1,19 @@
 [tool.poetry]
-name = "PDF ingest"
-version = "1.0.0"
-description = "Demonstrate the workflow to ingest PDF files, enrich images and create text markdowns"
+name = "advanced rag ingest"
+version = "0.9"
+description = "A powerful Python application for processing PDF files, extracting annotations, and generating structured output. This tool is designed to handle batch processing of PDF documents while maintaining detailed logging and providing user-friendly command-line interactions."
 authors = ["Tiran Dagan <tiran@tirandagan.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.11, <3.13"
-pillow = "^11.0.0"
-pymupdf = "^1.24.12"
-matplotlib = "^3.9.2"
-unstructured-ingest = "^0.1.1"
-inquirer = "^3.4.0"
-openai = "^1.52.1"
-tabulate = "^0.9.0"
-tqdm = "^4.66.5"
-pdf2image = "^1.17.0"
-unstructured = "^0.16.3"
 rich = "^13.9.3"
+pymupdf = "^1.24.13"
+matplotlib = "^3.9.2"
+openai = "^1.52.2"
+unstructured = "^0.16.3"
 markdown = "^3.7"
-unstructured-client = "^0.26.2"
+unstructured-ingest = "^0.2.1"
 
 
 [build-system]

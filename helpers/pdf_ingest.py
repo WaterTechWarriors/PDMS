@@ -17,6 +17,7 @@ from .config import global_config
 from .pdf_annotation import annotate_pdf_pages
 from .enrichments import enrich_json_with_summaries
 from .file_and_folder import get_files_with_extension, get_pdf_page_count
+from .logging import setup_logging
 
 from rich.console import Console
 from unstructured_ingest.v2.pipeline.pipeline import Pipeline
@@ -30,6 +31,7 @@ from unstructured_ingest.v2.processes.connectors.local import (
 from unstructured_ingest.v2.processes.partitioner import PartitionerConfig
 from unstructured_ingest.v2.processes.chunker import ChunkerConfig
 
+setup_logging()
 
 @dataclass
 class PipelineConfigs:
@@ -64,6 +66,7 @@ class PDFProcessor:
             os.makedirs(directory, exist_ok=True)
 
     def create_pipeline_configs(self, input_dir: str, output_dir: str, is_chunking: bool = False) -> PipelineConfigs:
+        
         """Create pipeline configurations for processing"""
         processor_config = ProcessorConfig(
             num_processes=3,
@@ -178,6 +181,7 @@ class PDFProcessor:
 
     def _run_pipeline(self, configs: PipelineConfigs):
         """Run the Unstructured.io pipeline with given configurations"""
+
         Pipeline.from_configs(
             context=configs.processor_config,
             indexer_config=configs.indexer_config,
