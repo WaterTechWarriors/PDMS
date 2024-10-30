@@ -26,7 +26,7 @@ from helpers.logging import setup_logging
 from helpers.generate_markdown import create_debugging_markdown
 
 from rich.console import Console
-from rich.prompt import Confirm, Prompt
+from rich.prompt import Prompt
 
 console = Console()
 

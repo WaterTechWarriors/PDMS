@@ -63,7 +63,11 @@ def generate_markdown(json_data, visual=False):
             page_content += f"<div style='font-size: 10px; color: lightgrey; display: block;'>{category} | ID: {id}</div>\n\n"
             if category == 'Title':
                 page_content += f"> # {content}\n\n"
-            elif category == 'NarrativeText':
+            elif category == 'Header' :
+                page_content += f"<div style='background-color: #f7facc;color: #000;padding: 12px 2px 2px 4px; border-bottom: 1px solid #000;'> {content}\n\n</div>"
+            elif category == 'Footer':
+                page_content += f"<div style='background-color: #f7facc;color: #000;padding: 12px 2px 2px 4px; border-top: 1px solid #000;'> {content}\n\n</div>"
+            elif category == 'NarrativeText' or category == 'UncategorizedText':
                 page_content += f"> {content}\n\n"
             elif category == 'ListItem':
                 page_content += f"> - {content}\n"

@@ -47,7 +47,7 @@ class PDFProcessor:
     def setup_logging(self):
         """Configure logging settings"""
         unstructured_logger.setLevel(logging.CRITICAL)
-        unstructured_logger.disabled = True
+        unstructured_logger.disabled = False
     def setup_directories(self):
         """Create necessary output directories"""
         self.output_dir = os.path.realpath(global_config.directories.output_dir)
@@ -95,7 +95,10 @@ class PDFProcessor:
         if is_chunking:
             configs.chunker_config = ChunkerConfig(
                 chunking_strategy="by_title",
-                chunk_max_characters=1500,
+                chunk_by_api=True,
+                chunk_api_key=global_config.api_keys.unstructured_api_key,
+                similarity_threshold=0.3,
+                chunk_max_characters=2500,
                 chunk_overlap=150
             )
             
