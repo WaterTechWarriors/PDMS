@@ -1,0 +1,6 @@
+-- Install dependencies
+pip install openai rich pymupdf unstructured unstructured-ingest matplotlib
+
+-- Run the script
+python main.py
+
